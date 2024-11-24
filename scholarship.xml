@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.6//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_6.dtd'>
+<nta>
+	<declaration>
+// Global declarations
+bool authenticated=false;
+bool hasApplied=false;
+bool canApply=true;
+int studentCGPA=7;
+
+// Channels
+chan login, logout;
+chan apply_merit, apply_merit_need;
+chan approve, reject;
+chan request_transcript, receive_transcript;
+    </declaration>
+	<template>
+		<name>Student</name>
+		<declaration>
+clock x;
+        </declaration>
+		<location id="id0" x="-255" y="119">
+			<name x="-280" y="85">SignIn</name>
+		</location>
+		<location id="id1" x="25" y="119">
+			<name x="-17" y="85">Autentication</name>
+			<label kind="invariant" x="0" y="136">x &lt;= 5</label>
+		</location>
+		<location id="id2" x="314" y="119">
+			<name x="331" y="127">Homepage</name>
+		</location>
+		<location id="id3" x="93" y="-102">
+			<name x="42" y="-136">ViewInfo</name>
+		</location>
+		<location id="id4" x="450" y="-93">
+			<name x="365" y="-127">FetchTranscription</name>
+		</location>
+		<location id="id5" x="688" y="-93">
+			<name x="714" y="-101">ServerRequest</name>
+		</location>
+		<location id="id6" x="816" y="119">
+			<name x="806" y="85">Logout</name>
+		</location>
+		<location id="id7" x="323" y="289">
+			<name x="255" y="306">ScholarshipApplication</name>
+		</location>
+		<location id="id8" x="187" y="399">
+			<name x="-42" y="391">MeritCumNeedApplication</name>
+		</location>
+		<location id="id9" x="476" y="399">
+			<name x="493" y="391">MeritApplication</name>
+		</location>
+		<location id="id10" x="340" y="501">
+			<name x="280" y="510">CommitteeReview</name>
+		</location>
+		<init ref="id0"/>
+		<transition id="id11">
+			<source ref="id1"/>
+			<target ref="id0"/>
+			<label kind="guard" x="-272" y="170">x &lt;= 5 &amp;&amp; !authenticated</label>
+			<nail x="-170" y="170"/>
+		</transition>
+		<transition id="id12">
+			<source ref="id3"/>
+			<target ref="id2"/>
+			<nail x="272" y="-93"/>
+		</transition>
+		<transition id="id13">
+			<source ref="id10"/>
+			<target ref="id2"/>
+			<label kind="guard" x="-238" y="357">studentCGPA &lt; 7</label>
+			<label kind="synchronisation" x="-238" y="382">reject!</label>
+			<label kind="assignment" x="-238" y="408">canApply := false</label>
+			<nail x="-85" y="493"/>
+			<nail x="-85" y="255"/>
+			<nail x="263" y="246"/>
+		</transition>
+		<transition id="id14">
+			<source ref="id10"/>
+			<target ref="id2"/>
+			<label kind="guard" x="697" y="357">studentCGPA &gt;= 7</label>
+			<label kind="synchronisation" x="697" y="340">approve!</label>
+			<label kind="assignment" x="697" y="382">canApply := false</label>
+			<nail x="680" y="493"/>
+			<nail x="680" y="255"/>
+			<nail x="374" y="255"/>
+		</transition>
+		<transition id="id15">
+			<source ref="id8"/>
+			<target ref="id10"/>
+			<label kind="guard" x="119" y="442">studentCGPA &gt;=7</label>
+		</transition>
+		<transition id="id16">
+			<source ref="id9"/>
+			<target ref="id10"/>
+			<label kind="guard" x="425" y="442">studentCGPA&gt;=9</label>
+		</transition>
+		<transition id="id17">
+			<source ref="id7"/>
+			<target ref="id9"/>
+			<label kind="guard" x="493" y="331">apply_merit!</label>
+			<nail x="476" y="289"/>
+		</transition>
+		<transition id="id18">
+			<source ref="id7"/>
+			<target ref="id8"/>
+			<label kind="guard" x="195" y="340">apply_merit_need!</label>
+			<nail x="187" y="297"/>
+		</transition>
+		<transition id="id19">
+			<source ref="id2"/>
+			<target ref="id7"/>
+			<label kind="guard" x="246" y="255">canApply</label>
+		</transition>
+		<transition id="id20">
+			<source ref="id2"/>
+			<target ref="id6"/>
+			<label kind="synchronisation" x="510" y="93">logout!</label>
+			<label kind="assignment" x="510" y="119">authenticated := false</label>
+		</transition>
+		<transition id="id21">
+			<source ref="id5"/>
+			<target ref="id2"/>
+			<label kind="synchronisation" x="535" y="34">request_transcript?</label>
+			<nail x="697" y="34"/>
+			<nail x="442" y="34"/>
+		</transition>
+		<transition id="id22">
+			<source ref="id2"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="399" y="-42">request_transcript!</label>
+		</transition>
+		<transition id="id23">
+			<source ref="id4"/>
+			<target ref="id5"/>
+		</transition>
+		<transition id="id24">
+			<source ref="id3"/>
+			<target ref="id2"/>
+			<nail x="102" y="0"/>
+			<nail x="229" y="8"/>
+		</transition>
+		<transition id="id25">
+			<source ref="id1"/>
+			<target ref="id2"/>
+			<label kind="guard" x="85" y="127">x &lt;= 5 &amp;&amp; authenticated</label>
+		</transition>
+		<transition id="id26">
+			<source ref="id0"/>
+			<target ref="id1"/>
+			<label kind="synchronisation" x="-212" y="94">login!</label>
+			<label kind="assignment" x="-195" y="119">x := 0</label>
+		</transition>
+	</template>
+	<template>
+		<name>Committee</name>
+		<location id="id27" x="-229" y="51">
+			<name x="-289" y="42">Idle</name>
+		</location>
+		<location id="id28" x="323" y="85">
+			<name x="348" y="76">Review</name>
+		</location>
+		<init ref="id27"/>
+		<transition id="id29">
+			<source ref="id27"/>
+			<target ref="id28"/>
+			<label kind="synchronisation" x="-8" y="-51">apply_merit?</label>
+			<nail x="-93" y="-59"/>
+			<nail x="178" y="-59"/>
+		</transition>
+		<transition id="id30">
+			<source ref="id27"/>
+			<target ref="id28"/>
+			<label kind="synchronisation" x="-25" y="-161">apply_merit_need?</label>
+			<nail x="-221" y="-170"/>
+			<nail x="323" y="-170"/>
+		</transition>
+		<transition id="id31">
+			<source ref="id28"/>
+			<target ref="id27"/>
+			<label kind="synchronisation" x="0" y="170">approve!</label>
+			<nail x="178" y="196"/>
+			<nail x="-110" y="196"/>
+		</transition>
+		<transition id="id32">
+			<source ref="id28"/>
+			<target ref="id27"/>
+			<label kind="synchronisation" x="0" y="255">reject!</label>
+			<nail x="323" y="281"/>
+			<nail x="-229" y="281"/>
+		</transition>
+	</template>
+	<template>
+		<name>Server</name>
+		<location id="id33" x="-221" y="76">
+			<name x="-289" y="59">Ready</name>
+		</location>
+		<location id="id34" x="459" y="68">
+			<name x="484" y="59">Processing</name>
+		</location>
+		<init ref="id33"/>
+		<transition id="id35">
+			<source ref="id33"/>
+			<target ref="id34"/>
+			<label kind="synchronisation" x="42" y="144">request_transcript?</label>
+			<nail x="-221" y="178"/>
+			<nail x="459" y="170"/>
+		</transition>
+		<transition id="id36">
+			<source ref="id34"/>
+			<target ref="id33"/>
+			<label kind="synchronisation" x="34" y="-42">receive_transcript!</label>
+			<nail x="459" y="-68"/>
+			<nail x="-221" y="-59"/>
+		</transition>
+	</template>
+	<system>
+// Process instantiations
+student = Student();
+committee = Committee();
+server = Server();
+
+// System composition
+system student, committee, server;
+    </system>
+	<queries>
+		<query>
+			<formula>A[] not deadlock
+A[] (Student.ScholarshipSelect imply authenticated)
+
+Student.ViewTranscript --&gt; Student.HomePage</formula>
+			<comment/>
+		</query>
+	</queries>
+</nta>
